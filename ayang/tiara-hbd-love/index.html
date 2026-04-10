@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Untuk Kesayanganku ❤️</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- tsParticles -->
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+
+    <style>
+        /* TEMA WARNA & BODY SETUP (Lebih gelap agar layar HP menonjol di PC) */
+        body {
+            background-color: #0b110c; 
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+
+        /* CONTAINER MOBILE VIEW ONLY */
+        #app-container {
+            width: 100%;
+            max-width: 440px; 
+            min-height: 100vh;
+            background-color: #ffffff;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9), 0 0 100px rgba(212,175,55,0.05);
+        }
+
+        .font-romantic { font-family: 'Dancing Script', cursive; }
+        .font-elegant { font-family: 'Playfair Display', serif; }
+
+        /* Sembunyikan scrollbar untuk galeri slider tapi tetap bisa di-scroll */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* PATTERN LINE ART MAWAR (FIXED BACKGROUND) */
+        #app-container::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 440px; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 25 C 75 10, 85 40, 50 65 C 15 40, 25 10, 50 25 Z' fill='none' stroke='%23D4AF37' stroke-width='0.7' opacity='0.3'/%3E%3Cpath d='M50 65 L 50 95 M 50 75 Q 65 70 70 55 M 50 85 Q 35 80 30 65' fill='none' stroke='%23D4AF37' stroke-width='0.7' opacity='0.3'/%3E%3Ccircle cx='50' cy='35' r='5' fill='none' stroke='%23D4AF37' stroke-width='0.5' opacity='0.3'/%3E%3C/svg%3E");
+            background-color: #ffffff;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #tsparticles {
+            position: fixed;
+            top: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 440px; height: 100%;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* 💥 CINEMATIC LAZY LOADING */
+        .reveal {
+            opacity: 0;
+            transform: translateY(100px) scale(0.85);
+            filter: blur(15px);
+            transition: all 1.2s cubic-bezier(0.165, 0.84, 0.44, 1); 
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+
+        /* 💥 HYPER HEARTBEAT */
+        @keyframes heartbeat {
+            0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(212,175,55,0)); }
+            14% { transform: scale(1.4); filter: drop-shadow(0 0 25px rgba(212,175,55,1)); }
+            28% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(212,175,55,0)); }
+            42% { transform: scale(1.4); filter: drop-shadow(0 0 25px rgba(212,175,55,1)); }
+            70% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(212,175,55,0)); }
+        }
+        .heart-beat { animation: heartbeat 1.5s infinite; }
+
+        @keyframes cinematicZoom {
+            0% { transform: scale(0.5); opacity: 0; filter: blur(20px); letter-spacing: -10px; }
+            50% { transform: scale(1.1); filter: blur(0); }
+            100% { transform: scale(1); opacity: 1; letter-spacing: normal; }
+        }
+        .cinematic-text {
+            animation: cinematicZoom 2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 10;
+        }
+
+        #flashOverlay {
+            position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 440px; height: 100%; background: white; z-index: 100;
+            opacity: 0; pointer-events: none; transition: opacity 1.5s ease-out;
+        }
+
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spin-slow {
+            animation: spinSlow 4s linear infinite;
+        }
+
+        .dynamic-parallax {
+            position: absolute;
+            pointer-events: none;
+            z-index: 6;
+            opacity: 0.4;
+            filter: blur(0.5px);
+            transition: transform 0.1s linear;
+        }
+
+        /* KEYFRAME FADE IN UNTUK ELEMEN HEADER (Memunculkan tombol scroll) */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* SCROLL LINE ART SINEMATIK */
+        @keyframes cinematicScrollLine {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .scroll-line-container {
+            width: 1px;
+            height: 60px;
+            background-color: rgba(212, 175, 55, 0.3);
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        .scroll-line-animated {
+            width: 100%;
+            height: 100%;
+            background-color: #D4AF37;
+            position: absolute;
+            top: 0; left: 0;
+            animation: cinematicScrollLine 2s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+        }
+
+        /* GERBANG DEKORATIF */
+        #transitionGate {
+            position: fixed;
+            top: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 440px; height: 100vh;
+            z-index: 80;
+            pointer-events: none;
+            display: none; 
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .gate-panel {
+            position: absolute;
+            top: 0; height: 100%; width: 50%;
+            background-color: #1a271d;
+            transition: transform 2s cubic-bezier(0.645, 0.045, 0.355, 1);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .gate-left { left: 0; border-right: 2px solid #D4AF37; }
+        .gate-right { right: 0; border-left: 2px solid #D4AF37; }
+        
+        .gate-decor {
+            position: absolute;
+            width: 150%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M100 20 C 150 0, 180 60, 100 100 C 20 60, 50 0, 100 20 Z' fill='none' stroke='%23D4AF37' stroke-width='2' opacity='0.5'/%3E%3Cpath d='M100 100 L 100 180 M 100 140 Q 140 120 160 80 M 100 160 Q 60 140 40 100' fill='none' stroke='%23D4AF37' stroke-width='2' opacity='0.5'/%3E%3C/svg%3E");
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+        }
+        .gate-left .gate-decor { left: 0; }
+        .gate-right .gate-decor { right: 0; transform: scaleX(-1); }
+
+        .gate-center-lock {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 80px; height: 80px; background-color: #D4AF37; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 30px rgba(212,175,55,0.5);
+            z-index: 85; transition: opacity 0.5s ease;
+        }
+
+        /* FRAME FOTO VINTAGE */
+        .vintage-container {
+            padding: 16px;
+            padding-bottom: 40px; 
+            background-color: #fdfcf0;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            position: relative;
+            transform: rotate(-3deg) scale(0.95);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid #e2dcd3;
+        }
+        .vintage-container:hover {
+            transform: rotate(0deg) scale(1.1);
+            box-shadow: 0 40px 70px rgba(212,175,55,0.4);
+            z-index: 20;
+        }
+        .vintage-container::after {
+            content: "";
+            position: absolute;
+            top: 6px; left: 6px; right: 6px; bottom: 6px;
+            border: 1px dashed #D4AF37;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .vintage-img {
+            width: 220px;
+            height: 280px;
+            object-fit: cover;
+            filter: sepia(0.3) contrast(1.1) brightness(0.95);
+        }
+
+        /* BOTTOM NAVBAR NAVIGASI */
+        #bottomNav {
+            transform: translateY(100%); /* Hidden default */
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #bottomNav.active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <!-- AUDIO PLAYER (MP3) -->
+        <audio id="bgMusic" loop preload="auto">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        </audio>
+
+        <!-- WRAPPER UNTUK ELEMEN UI FIXED (Rapi di tengah meskipun dibuka di PC) -->
+        <div class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] h-full pointer-events-none z-[150]">
+            
+            <!-- TRIGGER RAHASIA DEBUG PANEL (Ikon Lope 11x Klik) -->
+            <button onclick="handleSecretClick()" class="pointer-events-auto absolute top-6 right-6 text-white text-3xl opacity-20 hover:opacity-50 transition z-[200]">🤍</button>
+            
+            <!-- TOMBOL AUDIO MELAYANG -->
+            <button id="floatingAudioBtn" onclick="toggleAudio()" class="hidden pointer-events-auto absolute bottom-28 left-5 bg-[#D4AF37] hover:bg-[#b5952f] text-white w-12 h-12 rounded-full shadow-[0_5px_15px_rgba(212,175,55,0.5)] transform transition hover:scale-110 active:scale-95 flex items-center justify-center text-xl border-2 border-white">
+                🎵
+            </button>
+
+            <!-- DEBUG PANEL (Tersembunyi secara default) -->
+            <div id="debugPanel" class="hidden pointer-events-auto absolute bottom-28 right-5 bg-white bg-opacity-95 text-[#2b422f] p-4 rounded-xl shadow-2xl border-2 border-[#D4AF37] w-36">
+                <p class="font-bold mb-2 border-b border-gray-300 pb-1 text-center text-xs">⏱️ Debug Waktu</p>
+                <div class="flex flex-col gap-2 text-[10px] font-semibold">
+                    <button onclick="addTime(1)" class="bg-[#2b422f] text-white py-1.5 rounded shadow">+ 1 Jam</button>
+                    <button onclick="addTime(-1)" class="bg-[#2b422f] text-white py-1.5 rounded shadow">- 1 Jam</button>
+                    <button onclick="jumpToMidnight()" class="bg-[#D4AF37] text-white py-1.5 rounded shadow mt-1">✨ Ke 00:00</button>
+                    <button onclick="resetTime()" class="bg-gray-400 text-white py-1.5 rounded shadow mt-1">🔄 Reset</button>
+                </div>
+            </div>
+
+            <!-- BOTTOM NAVBAR -->
+            <nav id="bottomNav" class="pointer-events-auto absolute bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-[#D4AF37]/30 flex justify-around items-end pt-3 pb-6 px-2 shadow-[0_-10px_30px_rgba(0,0,0,0.15)]">
+                <button onclick="scrollToNext('homeSection')" class="flex flex-col items-center justify-center text-[#2b422f] hover:text-[#D4AF37] transition w-16 p-1 group">
+                    <span class="text-2xl drop-shadow-sm group-active:scale-90 transition-transform">🏠</span>
+                    <span class="text-[9px] font-bold mt-1 tracking-wider uppercase opacity-80">Awal</span>
+                </button>
+                <button onclick="scrollToNext('messageSection')" class="flex flex-col items-center justify-center text-[#2b422f] hover:text-[#D4AF37] transition w-16 p-1 group">
+                    <span class="text-2xl drop-shadow-sm group-active:scale-90 transition-transform">💌</span>
+                    <span class="text-[9px] font-bold mt-1 tracking-wider uppercase opacity-80">Pesan</span>
+                </button>
+                <button onclick="scrollToNext('gallerySection')" class="flex flex-col items-center justify-center text-[#2b422f] hover:text-[#D4AF37] transition w-16 p-1 group">
+                    <span class="text-2xl drop-shadow-sm group-active:scale-90 transition-transform">📸</span>
+                    <span class="text-[9px] font-bold mt-1 tracking-wider uppercase opacity-80">Galeri</span>
+                </button>
+                <button onclick="scrollToNext('replySection')" class="flex flex-col items-center justify-center text-[#2b422f] hover:text-[#D4AF37] transition w-16 p-1 group">
+                    <span class="text-2xl drop-shadow-sm group-active:scale-90 transition-transform">✨</span>
+                    <span class="text-[9px] font-bold mt-1 tracking-wider uppercase opacity-80">Balas</span>
+                </button>
+            </nav>
+        </div> <!-- Akhir dari Fixed UI Wrapper -->
+
+        <div id="tsparticles"></div>
+        <div id="parallaxContainer"></div>
+        <div id="flashOverlay"></div> 
+
+        <!-- LIGHTBOX GALERI (POP-UP) -->
+        <div id="galleryLightbox" class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] h-full bg-[#1a271d]/95 backdrop-blur-sm z-[200] hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300">
+            <button onclick="closeLightbox()" class="absolute top-6 right-6 text-[#D4AF37] text-5xl hover:scale-110 transition drop-shadow-lg">&times;</button>
+            
+            <div class="relative w-full flex items-center justify-center px-4">
+                <button onclick="prevPhoto()" class="absolute left-2 text-[#D4AF37] text-4xl p-2 drop-shadow-xl hover:scale-110 transition z-10">&#10094;</button>
+                <img id="lightboxImg" src="" class="max-w-[85%] max-h-[75vh] object-contain rounded-xl shadow-2xl transition-transform duration-300 transform scale-95 border-2 border-[#D4AF37]">
+                <button onclick="nextPhoto()" class="absolute right-2 text-[#D4AF37] text-4xl p-2 drop-shadow-xl hover:scale-110 transition z-10">&#10095;</button>
+            </div>
+            
+            <div id="lightboxCounter" class="absolute bottom-16 bg-[#D4AF37] text-white px-4 py-1 rounded-full font-elegant tracking-widest text-sm shadow-lg border border-white">
+                1 / 11
+            </div>
+        </div>
+
+        <!-- ==========================================
+             LAYER 1: INTRO SCREEN
+        =========================================== -->
+        <div id="introScreen" class="absolute inset-0 flex flex-col items-center justify-center z-40 bg-white bg-opacity-90 backdrop-blur-sm transition-opacity duration-1000 content-layer">
+            <div class="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-[85%] mx-auto border-2 border-[#D4AF37]">
+                <div class="text-4xl mb-4 text-[#D4AF37] animate-bounce">💌</div>
+                <h1 class="text-3xl font-romantic text-[#2b422f] mb-2">Ada Pesan Untukmu</h1>
+                <p class="text-gray-500 mb-8 text-xs font-elegant italic">Pencet tombol di bawah ya sayang...</p>
+                <button id="startBtn" onclick="startExperience()" class="bg-[#D4AF37] text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95 text-sm uppercase tracking-widest">
+                    Buka Sekarang
+                </button>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             LAYER 2: COUNTDOWN SCREEN
+        =========================================== -->
+        <div id="countdownScreen" class="hidden absolute inset-0 flex-col items-center justify-center w-full p-4 z-30 content-layer bg-white bg-opacity-80 backdrop-blur-sm transition-opacity duration-1000">
+            <h2 class="text-3xl font-elegant italic text-[#2b422f] mb-2 text-center">Menunggu Waktu<br>Yang Tepat</h2>
+            <div class="text-3xl mb-8 mt-2 heart-beat text-[#D4AF37]">⏳</div>
+            
+            <div class="flex gap-3 text-center justify-center w-full">
+                <div class="bg-white p-4 rounded-xl shadow-lg w-24 border border-[#2b422f]">
+                    <span id="hours" class="text-4xl font-bold text-[#D4AF37]">00</span>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Jam</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-lg w-24 border border-[#2b422f]">
+                    <span id="minutes" class="text-4xl font-bold text-[#D4AF37]">00</span>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Menit</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-lg w-24 border border-[#2b422f]">
+                    <span id="seconds" class="text-4xl font-bold text-[#D4AF37]">00</span>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Detik</p>
+                </div>
+            </div>
+            <p class="mt-10 text-[#2b422f] text-center text-sm font-elegant italic px-6 bg-white bg-opacity-70 py-2 rounded-full shadow-sm border border-[#D4AF37]">
+                Tunggu sampai jarum jam menunjukkan 00:00 ya...
+            </p>
+        </div>
+
+        <!-- ==========================================
+             TRANSISI GERBANG
+        =========================================== -->
+        <div id="transitionGate">
+            <div id="gateLeft" class="gate-panel gate-left">
+                <div class="gate-decor"></div>
+            </div>
+            <div id="gateRight" class="gate-panel gate-right">
+                <div class="gate-decor"></div>
+            </div>
+            <div id="gateLock" class="gate-center-lock text-white text-3xl">🌹</div>
+        </div>
+
+        <!-- ==========================================
+             LAYER 3: CELEBRATION SCREEN
+        =========================================== -->
+        <div id="celebrationScreen" class="hidden flex-col items-center justify-start w-full z-20 pb-20 pt-4 content-layer">
+            
+            <!-- HEADER -->
+            <section id="homeSection" class="min-h-[90vh] flex flex-col items-center justify-center p-6 text-center w-full">
+                <p class="text-[#D4AF37] font-elegant italic text-lg mb-2 tracking-widest bg-white bg-opacity-80 px-4 py-1 rounded-full border border-[#D4AF37] opacity-0 animate-[fadeIn_1s_ease_1s_forwards]">11 April 2026</p>
+                <h1 class="text-6xl font-romantic text-[#2b422f] mb-4 leading-tight drop-shadow-md mt-4 cinematic-text opacity-0">Selamat<br>Ulang Tahun!</h1>
+                <div class="text-4xl mb-8 heart-beat text-[#D4AF37] opacity-0 animate-[fadeIn_1s_ease_2s_forwards]">🤍</div>
+
+                <!-- MP3 PLAYER CARD -->
+                <div class="w-full max-w-[260px] mx-auto mb-10 bg-white bg-opacity-95 p-3 rounded-full shadow-lg border border-[#D4AF37] flex items-center gap-4 opacity-0 animate-[fadeIn_1s_ease_2.2s_forwards]">
+                    <div id="musicDisc" class="w-10 h-10 rounded-full bg-[#2b422f] border-2 border-[#D4AF37] flex items-center justify-center spin-slow">
+                        <span class="text-xs">🎵</span>
+                    </div>
+                    <div class="flex-1 text-left">
+                        <p class="text-xs font-bold text-[#2b422f] leading-none">Lagu Spesial Kita</p>
+                        <p class="text-[9px] text-gray-500 mt-1">Sedang diputar...</p>
+                    </div>
+                    <button onclick="toggleAudio()" id="inlineAudioBtn" class="w-8 h-8 bg-[#D4AF37] text-white rounded-full flex items-center justify-center mr-1 hover:bg-[#b5952f] transition">
+                        ⏸️
+                    </button>
+                </div>
+
+                <!-- Tombol Scroll Line Art Sinematik -->
+                <div onclick="scrollToNext('vintageSection')" class="cursor-pointer flex flex-col items-center justify-center mt-4 opacity-0 animate-[fadeIn_1s_ease_2.5s_forwards] group">
+                    <span class="text-[9px] uppercase tracking-[0.3em] font-elegant text-[#2b422f] mb-4 group-hover:text-[#D4AF37] transition-colors">Geser Ke Bawah</span>
+                    <div class="scroll-line-container">
+                        <div class="scroll-line-animated"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FOTO DIA (FRAME VINTAGE) -->
+            <section id="vintageSection" class="min-h-[80vh] flex flex-col items-center justify-center p-8 text-center reveal w-full mt-10">
+                <div class="relative z-10">
+                    <div class="vintage-container">
+                        <!-- GANTI URL INI DENGAN FOTO PACARMU SENDIRIAN -->
+                        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Si Cantik" class="vintage-img">
+                    </div>
+                    <div class="absolute -bottom-8 -right-6 text-5xl text-[#D4AF37] drop-shadow-md animate-pulse">✨</div>
+                    <div class="absolute -top-6 -left-8 text-5xl text-[#D4AF37] drop-shadow-md">🌸</div>
+                </div>
+                <p class="mt-12 font-romantic text-4xl text-[#2b422f] drop-shadow-sm bg-white bg-opacity-80 px-6 py-2 rounded-full border border-[#D4AF37]">
+                    Untuk kamu yang terindah...
+                </p>
+            </section>
+
+            <!-- UCAPAN -->
+            <div id="messageSection" class="w-full">
+                <section class="flex items-center justify-center p-8 text-center reveal w-full mt-16">
+                    <div class="bg-white bg-opacity-95 p-8 rounded-3xl shadow-[0_15px_35px_rgba(212,175,55,0.2)] border-l-4 border-t border-b border-r border-[#D4AF37] border-r-transparent relative w-full">
+                        <span class="absolute -top-6 -left-2 text-6xl font-serif text-[#D4AF37] opacity-40">"</span>
+                        <p class="text-[#2b422f] font-elegant text-base leading-relaxed italic relative z-10 text-left">
+                            Hai sayang, cieee umurnya nambah lagi hari ini! 🎉<br><br>
+                            Di hari yang paling spesial ini, aku mau ngucapin selamat ulang tahun buat orang yang paling berharga di hidupku. Makasih banyak ya udah lahir ke dunia ini dan mengizinkan aku masuk jadi bagian dari ceritamu.
+                        </p>
+                    </div>
+                </section>
+
+                <section class="flex items-center justify-center p-8 text-center reveal w-full mt-8">
+                    <div class="bg-[#2b422f] bg-opacity-95 p-8 rounded-3xl shadow-[0_15px_35px_rgba(0,0,0,0.3)] w-full border-r-4 border-t border-b border-l border-[#D4AF37] border-l-transparent relative">
+                        <span class="absolute -bottom-8 -right-2 text-6xl font-serif text-[#D4AF37] opacity-40 rotate-180">"</span>
+                        <p class="text-white font-elegant text-base leading-relaxed relative z-10 text-right">
+                            Aku selalu bersyukur atas setiap momen yang kita lewati bareng-bareng. Ketawa bareng, cerita ngalor-ngidul, sampai hal-hal kecil yang selalu bikin aku sadar betapa beruntungnya aku punya kamu. ✨
+                        </p>
+                    </div>
+                </section>
+
+                <section class="flex items-center justify-center p-8 text-center reveal w-full mt-8">
+                    <div class="bg-white bg-opacity-95 p-8 rounded-3xl shadow-[0_15px_35px_rgba(212,175,55,0.2)] border-l-4 border-t border-b border-r border-[#D4AF37] border-r-transparent relative w-full">
+                        <span class="absolute -top-6 -left-2 text-6xl font-serif text-[#D4AF37] opacity-40">"</span>
+                        <p class="text-[#2b422f] font-elegant text-base leading-relaxed italic relative z-10 text-left">
+                            Semoga di umur yang baru ini, kamu makin bahagia, makin sehat badannya, dan semua impian serta cita-citamu pelan-pelan tercapai. Terus jadi anak baik dan kebanggaan keluarga ya...
+                        </p>
+                    </div>
+                </section>
+
+                <section class="min-h-[40vh] flex flex-col items-center justify-center p-8 text-center reveal w-full mt-12 mb-10">
+                    <div class="bg-gradient-to-br from-[#D4AF37] to-[#b5952f] p-8 rounded-[40px] shadow-2xl border-4 border-white relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl transform translate-x-10 -translate-y-10"></div>
+                        <p class="text-white font-elegant text-sm mb-4 tracking-widest uppercase opacity-90 drop-shadow-sm">Satu hal yang pasti...</p>
+                        <p class="text-white font-romantic text-3xl leading-relaxed drop-shadow-md">
+                            Aku akan selalu ada di sini buat dukung kamu. Terus jadi versi terbaik dirimu, dan pastinya... semoga kamu makin sayang sama aku! 🥰
+                        </p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- GALERI FOTO BERSAMA -->
+            <section id="gallerySection" class="flex flex-col items-center justify-start reveal w-full overflow-hidden mt-16 pb-10">
+                <div class="flex items-center gap-3 mb-6 z-20 bg-white px-8 py-3 rounded-full shadow-lg border border-[#D4AF37]">
+                    <span class="text-[#D4AF37] text-xl">✨</span>
+                    <h2 class="text-2xl font-romantic text-[#2b422f]">Memori Kita Bersama</h2>
+                    <span class="text-[#D4AF37] text-xl">✨</span>
+                </div>
+                
+                <p class="text-[10px] text-gray-500 font-elegant italic z-20 mb-4 bg-white bg-opacity-80 px-4 py-2 rounded-full shadow-sm border border-gray-200">
+                    (Foto bergeser otomatis, tap foto untuk membesarkan)
+                </p>
+
+                <!-- Slider Container Auto-Scroll -->
+                <div id="imageSlider" class="flex overflow-x-auto snap-x snap-mandatory gap-5 px-8 pb-10 pt-4 scrollbar-hide w-full" style="scroll-padding-left: 2rem;">
+                    <!-- Foto akan di-generate via JS -->
+                </div>
+            </section>
+
+            <!-- AESTHETIC FOOTER & TOMBOL WA -->
+            <footer id="replySection" class="mt-10 bg-[#1a271d] pt-20 pb-36 w-full relative z-20 flex flex-col items-center border-t border-[#D4AF37] shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+                <!-- Overlay glow -->
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-10 bg-[#D4AF37] blur-[50px] opacity-20 pointer-events-none"></div>
+
+                <p class="text-[#D4AF37] font-romantic text-6xl mb-4 drop-shadow-lg z-10">I Love You</p>
+                <p class="text-gray-400 font-elegant text-xs tracking-[0.3em] uppercase mb-12 z-10 text-center px-4">Terima kasih telah<br>menjadi bagian terindah</p>
+                
+                <!-- Ganti nomor HP pada link href di bawah ini -->
+                <a href="https://wa.me/6281234567890?text=Halo%20sayang!%20%E2%9D%A4%EF%B8%8F%0AAku%20udah%20buka%20website%20kejutannya.%0AMakasih%20banyak%20yaaa%20buat%20ucapan%20dan%20doanya...%20Love%20you!" target="_blank" class="bg-[#D4AF37] hover:bg-[#b5952f] text-white px-8 py-4 rounded-full font-bold shadow-[0_10px_25px_rgba(212,175,55,0.4)] border border-[#f9f3e3] transform transition hover:scale-105 flex items-center gap-3 z-10 mb-16">
+                    <span class="text-2xl">💌</span>
+                    <span>Kirim Balasan Pesan</span>
+                </a>
+
+                <!-- Made With Love Text -->
+                <div class="text-gray-500 font-elegant text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 z-10 bg-white/5 px-6 py-2 rounded-full border border-white/10 shadow-inner">
+                    <span>Made with</span> 
+                    <span class="text-red-500 animate-pulse text-sm">❤️</span> 
+                    <span>Just for you</span>
+                </div>
+            </footer>
+        </div>
+    </div> 
+
+    <script>
+        // --- KONFIGURASI TANGGAL ---
+        const countDownDate = new Date("April 11, 2026 00:00:00").getTime();
+
+        // --- AUDIO PLAYER SETUP ---
+        let isMusicPlaying = false;
+        let audioPromise;
+
+        // --- GALERI FOTO (11 Foto) ---
+        const galleryPhotos = [
+            "https://images.unsplash.com/photo-1518199266791-5375a83190b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1494774157365-9e04c6720e47?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1621252179027-94459d278660?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1583939003579-730e3918a45a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1529634597503-139d3726efea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+        ];
+
+        let countdownInterval;
+        let timeOffset = 0; 
+        let celebrationStarted = false; 
+
+        // --- SISTEM SECRET TRIGGER (11x Klik Ikon Hati) ---
+        let secretClicks = 0;
+        let secretTimeout;
+        
+        function handleSecretClick() {
+            secretClicks++;
+            clearTimeout(secretTimeout);
+            
+            // Akan reset jika tidak diklik lagi dalam 2 detik
+            secretTimeout = setTimeout(() => {
+                secretClicks = 0;
+            }, 2000);
+
+            if (secretClicks >= 11) {
+                const panel = document.getElementById("debugPanel");
+                panel.classList.toggle("hidden");
+                secretClicks = 0; // Reset setelah panel terbuka
+            }
+        }
+
+        // --- PARTIKEL tsParticles ---
+        tsParticles.load("tsparticles", {
+            particles: {
+                number: { value: 30, density: { enable: true, value_area: 800 } },
+                color: { value: ["#D4AF37", "#f9f3e3", "#ffffff"] },
+                shape: { type: ["circle", "star"] },
+                opacity: { value: 0.6, random: true },
+                size: { value: 4, random: true, anim: { enable: true, speed: 2, size_min: 2 } },
+                move: { 
+                    enable: true, speed: 1.5, direction: "bottom", random: true, 
+                    straight: false, out_mode: "out", wobble: { enable: true, distance: 10, speed: 5 } 
+                }
+            },
+            interactivity: { events: { onhover: { enable: false }, onclick: { enable: false } } },
+            retina_detect: true
+        });
+
+        function generateParallaxItems() {
+            const container = document.getElementById('parallaxContainer');
+            const icons = ['✨', '🌿', '🤍', '🌸'];
+            const totalItems = 25; 
+            const pageHeight = 3500; 
+
+            for(let i=0; i<totalItems; i++) {
+                const el = document.createElement('div');
+                el.innerText = icons[Math.floor(Math.random() * icons.length)];
+                el.className = 'dynamic-parallax';
+                
+                const top = Math.random() * pageHeight;
+                const left = Math.random() * 90; 
+                const size = Math.floor(Math.random() * 20) + 15; 
+                const rotate = Math.floor(Math.random() * 360);
+                const speed = (Math.random() * 0.4) + 0.1;
+
+                el.style.top = `${top}px`;
+                el.style.left = `${left}%`;
+                el.style.fontSize = `${size}px`;
+                el.style.transform = `rotate(${rotate}deg)`;
+                
+                el.dataset.speed = speed;
+                el.dataset.origRotate = rotate;
+
+                container.appendChild(el);
+            }
+        }
+
+        // --- GALERI AUTO-SCROLL & LIGHTBOX ---
+        let autoScrollInterval;
+        let currentLightboxIndex = 0;
+
+        function initGallerySlider() {
+            const slider = document.getElementById('imageSlider');
+            slider.innerHTML = ''; 
+
+            galleryPhotos.forEach((src, index) => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.className = 'snap-center shrink-0 w-64 h-80 object-cover rounded-2xl shadow-[0_10px_30px_rgba(212,175,55,0.3)] border-2 border-[#D4AF37] transition-transform duration-300 hover:scale-105 cursor-pointer';
+                
+                img.onclick = () => openLightbox(index);
+                slider.appendChild(img);
+            });
+
+            startAutoScroll();
+        }
+
+        function startAutoScroll() {
+            const slider = document.getElementById('imageSlider');
+            if(!slider) return;
+
+            clearInterval(autoScrollInterval);
+            autoScrollInterval = setInterval(() => {
+                const maxScroll = slider.scrollWidth - slider.clientWidth;
+                if(slider.scrollLeft >= maxScroll - 20) {
+                    slider.scrollTo({left: 0, behavior: 'smooth'});
+                } else {
+                    slider.scrollBy({left: 270, behavior: 'smooth'}); 
+                }
+            }, 3000);
+
+            slider.addEventListener('mouseenter', () => clearInterval(autoScrollInterval));
+            slider.addEventListener('mouseleave', startAutoScroll);
+            slider.addEventListener('touchstart', () => clearInterval(autoScrollInterval));
+            slider.addEventListener('touchend', startAutoScroll);
+        }
+
+        function openLightbox(index) {
+            currentLightboxIndex = index;
+            updateLightboxContent();
+            
+            const lightbox = document.getElementById('galleryLightbox');
+            lightbox.classList.remove('hidden');
+            lightbox.classList.add('flex');
+            
+            setTimeout(() => {
+                lightbox.classList.remove('opacity-0');
+                document.getElementById('lightboxImg').classList.remove('scale-95');
+                document.getElementById('lightboxImg').classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('galleryLightbox');
+            lightbox.classList.add('opacity-0');
+            document.getElementById('lightboxImg').classList.remove('scale-100');
+            document.getElementById('lightboxImg').classList.add('scale-95');
+            
+            setTimeout(() => {
+                lightbox.classList.add('hidden');
+                lightbox.classList.remove('flex');
+            }, 300);
+        }
+
+        function nextPhoto() {
+            currentLightboxIndex = (currentLightboxIndex + 1) % galleryPhotos.length;
+            updateLightboxContent();
+        }
+
+        function prevPhoto() {
+            currentLightboxIndex = (currentLightboxIndex - 1 + galleryPhotos.length) % galleryPhotos.length;
+            updateLightboxContent();
+        }
+
+        function updateLightboxContent() {
+            document.getElementById('lightboxImg').src = galleryPhotos[currentLightboxIndex];
+            document.getElementById('lightboxCounter').innerText = `${currentLightboxIndex + 1} / ${galleryPhotos.length}`;
+        }
+
+        // --- SCROLL PARALLAX & OBSERVER (Disesuaikan untuk Mobile Container) ---
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            document.querySelectorAll('.dynamic-parallax').forEach(el => {
+                const speed = parseFloat(el.dataset.speed);
+                const origRot = el.dataset.origRotate;
+                el.style.transform = `translateY(${-(scrollY * speed)}px) rotate(${origRot}deg)`;
+            });
+        });
+
+        function scrollToNext(sectionId) {
+            const target = document.getElementById(sectionId);
+            if(target) {
+                const y = target.getBoundingClientRect().top + window.scrollY - 50;
+                window.scrollTo({top: y, behavior: 'smooth'});
+            }
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
+
+        function initScrollAnimations() {
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        function updateAudioUI() {
+            const floatingBtn = document.getElementById("floatingAudioBtn");
+            const inlineBtn = document.getElementById("inlineAudioBtn");
+            const disc = document.getElementById("musicDisc");
+            
+            if (isMusicPlaying) {
+                if(floatingBtn) floatingBtn.innerText = "🎵";
+                if(inlineBtn) inlineBtn.innerText = "⏸️";
+                if(disc) disc.style.animationPlayState = 'running';
+            } else {
+                if(floatingBtn) floatingBtn.innerText = "🔇";
+                if(inlineBtn) inlineBtn.innerText = "▶️";
+                if(disc) disc.style.animationPlayState = 'paused';
+            }
+        }
+
+        function toggleAudio() {
+            const music = document.getElementById("bgMusic");
+
+            if (isMusicPlaying) {
+                music.pause();
+                isMusicPlaying = false;
+                updateAudioUI();
+            } else {
+                music.play().then(() => {
+                    isMusicPlaying = true;
+                    updateAudioUI();
+                }).catch(e => console.log("Play error:", e));
+            }
+        }
+
+        function startExperience() {
+            const intro = document.getElementById("introScreen");
+            intro.style.opacity = '0';
+            
+            // Pancing izin audio browser di klik pertama (tapi jangan langsung dimainkan panjang)
+            const music = document.getElementById("bgMusic");
+            music.volume = 0.6;
+            music.play().then(() => { 
+                music.pause(); // Langsung pause, nunggu jam 00:00
+                music.currentTime = 0;
+            }).catch(e => {
+                console.log("Menunggu interaksi user untuk lagu", e);
+            });
+
+            setTimeout(() => {
+                intro.classList.add("hidden");
+                checkTimeAndStart();
+            }, 1000);
+        }
+
+        function checkTimeAndStart() {
+            updateCountdown(); 
+            clearInterval(countdownInterval); 
+            countdownInterval = setInterval(updateCountdown, 1000);
+        }
+
+        function updateCountdown() {
+            if(celebrationStarted) return; 
+
+            const now = new Date().getTime() + timeOffset; 
+            const distance = countDownDate - now;
+
+            if (distance <= 0) {
+                clearInterval(countdownInterval);
+                triggerGateTransition(); 
+            } else {
+                document.getElementById("countdownScreen").classList.remove("hidden");
+                document.getElementById("countdownScreen").classList.add("flex");
+
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
+                document.getElementById("minutes").innerText = minutes.toString().padStart(2, '0');
+                document.getElementById("seconds").innerText = seconds.toString().padStart(2, '0');
+            }
+        }
+
+        function triggerGateTransition() {
+            celebrationStarted = true;
+            
+            const gate = document.getElementById("transitionGate");
+            gate.style.display = "block";
+            
+            setTimeout(() => { gate.style.opacity = "1"; }, 50);
+
+            setTimeout(() => {
+                document.getElementById("countdownScreen").style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById("countdownScreen").classList.add("hidden");
+                    document.getElementById("countdownScreen").classList.remove("flex");
+
+                    document.getElementById("celebrationScreen").classList.remove("hidden");
+                    document.getElementById("celebrationScreen").classList.add("flex");
+                    
+                    document.getElementById("floatingAudioBtn").classList.remove("hidden");
+
+                    initGallerySlider();
+                    generateParallaxItems();
+                    initScrollAnimations();
+                }, 100);
+
+                setTimeout(() => {
+                    document.getElementById("gateLock").style.opacity = "0"; 
+                    document.getElementById("gateLeft").style.transform = "translateX(-100%) scale(1.1)"; 
+                    document.getElementById("gateRight").style.transform = "translateX(100%) scale(1.1)";
+
+                    const flash = document.getElementById("flashOverlay");
+                    flash.style.opacity = "0.8";
+                    setTimeout(() => flash.style.opacity = "0", 300); 
+
+                    // --- AUTOPLAY MUSIK SAAT GERBANG TERBUKA ---
+                    const music = document.getElementById("bgMusic");
+                    music.play().then(() => {
+                        isMusicPlaying = true;
+                        updateAudioUI();
+                    }).catch(e => console.log("Autoplay dicegah browser:", e));
+
+                    // Tampilkan Navigasi Bawah
+                    setTimeout(() => {
+                        document.getElementById("bottomNav").classList.add("active");
+                    }, 1000);
+
+                    const particlesContainer = tsParticles.domItem(0);
+                    if(particlesContainer) {
+                        particlesContainer.options.particles.move.speed = 25; 
+                        particlesContainer.options.particles.size.value = 8;  
+                        particlesContainer.options.particles.opacity.value = 1;
+                        particlesContainer.refresh();
+
+                        setTimeout(() => {
+                            particlesContainer.options.particles.move.speed = 3;
+                            particlesContainer.options.particles.size.value = 4;
+                            particlesContainer.options.particles.opacity.value = 0.6;
+                            particlesContainer.refresh();
+                        }, 2000);
+                    }
+
+                    setTimeout(() => { gate.style.display = "none"; }, 2000);
+
+                }, 800); 
+
+            }, 600); 
+        }
+
+        // --- FUNGSI ALAT TESTING ---
+        function addTime(hours) {
+            timeOffset += hours * 60 * 60 * 1000;
+            if(!celebrationStarted) updateCountdown();
+        }
+
+        function jumpToMidnight() {
+            const realNow = new Date().getTime();
+            timeOffset = countDownDate - realNow; 
+            if(!celebrationStarted) updateCountdown();
+        }
+
+        function resetTime() {
+            timeOffset = 0; 
+            celebrationStarted = false;
+            
+            document.getElementById("celebrationScreen").classList.add("hidden");
+            document.getElementById("celebrationScreen").classList.remove("flex");
+            document.getElementById("countdownScreen").style.opacity = "1";
+            document.getElementById("bottomNav").classList.remove("active");
+            clearInterval(autoScrollInterval); // Stop scroll
+            
+            const gate = document.getElementById("transitionGate");
+            gate.style.display = "none";
+            gate.style.opacity = "0";
+            document.getElementById("gateLeft").style.transform = "translateX(0)";
+            document.getElementById("gateRight").style.transform = "translateX(0)";
+            document.getElementById("gateLock").style.opacity = "1";
+
+            document.getElementById('parallaxContainer').innerHTML = '';
+
+            const particlesContainer = tsParticles.domItem(0);
+            if(particlesContainer) {
+                particlesContainer.options.particles.move.speed = 1.5;
+                particlesContainer.options.particles.size.value = 4;
+                particlesContainer.refresh();
+            }
+
+            if (document.getElementById("introScreen").classList.contains("hidden")) {
+                checkTimeAndStart();
+            }
+        }
+    </script>
+</body>
+</html>
